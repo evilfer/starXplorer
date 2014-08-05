@@ -3,6 +3,8 @@ angular.module('starXplorer').directive('xRenderer', function () {
         restrict: 'A',
         scope: true,
         link: function ($scope, element, attrs) {
+            var $element = angular.element(element);
+
             var viewAngle = 45,
                 near = 0.1,
                 far = 10000;
@@ -13,38 +15,25 @@ angular.module('starXplorer').directive('xRenderer', function () {
             var scene = new THREE.Scene();
             scene.add(camera);
 
-            camera.position.z = 300;
+            camera.position.z = 0;
 
             var renderF = function () {
                 renderer.render(scene, camera);
             };
 
 
-            var controls = new THREE.TrackballControls(camera, renderer.domElement);
-
+            var controls = new THREE.TrackballControls(camera);
+            controls.noPan
             controls.addEventListener('change', renderF);
 
             element.append(renderer.domElement);
-
-            var radius = 50,
-                segments = 32,
-                rings = 32;
-
-            var sphereMaterial = new THREE.MeshLambertMaterial({color: 0xCCFF00});
-            var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), sphereMaterial);
-            scene.add(sphere);
-
-            var sphereMaterial2 = new THREE.MeshLambertMaterial({color: 0xCC00FF});
-            var sphere2 = new THREE.Mesh(new THREE.SphereGeometry(.5 * radius, segments, rings), sphereMaterial2);
-            scene.add(sphere2);
-            sphere2.position.x += 100;
 
             var lineMaterial = new THREE.LineBasicMaterial({color: 0xe0e0e0, lineWidth: 2});
             var lineGeometry = new THREE.Geometry();
             var lineN = 100;
             var lineA = 2 * Math.PI / lineN;
             for (var i = 0; i <= lineN; i++) {
-                lineGeometry.vertices.push(new THREE.Vector3(100 * Math.cos(i * lineA), 100 * Math.sin(i * lineA), 0));
+                lineGeometry.vertices.push(new THREE.Vector3(0, 100 * Math.cos(i * lineA), 100 * Math.sin(i * lineA)));
             }
             var line = new THREE.Line(lineGeometry, lineMaterial);
             scene.add(line);
@@ -68,12 +57,12 @@ angular.module('starXplorer').directive('xRenderer', function () {
                 renderF();
             };
 
-            element.resize(resizeF);
+            $element.resize(resizeF);
             //$( window ).resize(resizeF);
             resizeF();
 
             (function animate() {
-                requestAnimationFrame(animate, element);
+                requestAnimationFrame(animate, $element);
                 controls.update();
             })();
         }
